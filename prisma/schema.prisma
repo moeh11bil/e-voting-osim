@@ -1,0 +1,81 @@
+// Prisma schema untuk E-Voting OSIM (sesuai PRD)
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  nama      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("admins")
+}
+
+model Candidate {
+  id        Int      @id @default(autoincrement())
+  nomorUrut Int      @unique @map("nomor_urut")
+  namaKetua String   @map("nama_ketua") @db.VarChar(100)
+  namaWakil String   @map("nama_wakil") @db.VarChar(100)
+  foto      String?  @db.VarChar(255)
+  visi      String   @db.Text
+  misi      String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  votes Vote[]
+
+  @@map("candidates")
+}
+
+model Voter {
+  id        Int       @id @default(autoincrement())
+  nisn      String    @unique @db.VarChar(20)
+  nama      String    @db.VarChar(100)
+  kelas     String    @db.VarChar(50)
+  token     String?   @unique @db.VarChar(10)
+  isVoted   Boolean   @default(false) @map("is_voted")
+  votedAt   DateTime? @map("voted_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  vote      Vote?
+
+  @@map("voters")
+}
+
+model Vote {
+  id          Int       @id @default(autoincrement())
+  voterId     Int       @unique @map("voter_id")
+  voter       Voter     @relation(fields: [voterId], references: [id], onDelete: Cascade)
+  candidateId Int       @map("candidate_id")
+  candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@map("votes")
+}
+
+/// Pengaturan madrasah & pemilihan. Sengaja hanya satu baris (id = 1).
+model MadrasahSetting {
+  id             Int      @id @default(1)
+  namaMadrasah   String   @map("nama_madrasah") @db.VarChar(150)
+  npsn           String?  @db.VarChar(20)
+  alamat         String?  @db.VarChar(255)
+  telepon        String?  @db.VarChar(30)
+  email          String?  @db.VarChar(100)
+  website        String?  @db.VarChar(100)
+  kepalaMadrasah String?  @map("kepala_madrasah") @db.VarChar(100)
+  namaOrganisasi String   @default("OSIM") @map("nama_organisasi") @db.VarChar(50)
+  tahunPelajaran String   @default("2024/2025") @map("tahun_pelajaran") @db.VarChar(20)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("madrasah_settings")
+}

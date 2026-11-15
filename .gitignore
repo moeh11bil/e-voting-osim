@@ -1,0 +1,27 @@
+# Dependensi
+node_modules/
+
+# Output Nuxt / Nitro
+.nuxt/
+.output/
+.nitro/
+dist/
+
+# Data lokal & cache runtime
+.data/
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+
+# Environment (jangan pernah commit kredensial)
+.env
+.env.*
+!.env.example
+
+# Riwayat agent & berkas sistem
+.agent_history
+.agent_history/
+.DS_Store
+Thumbs.db
+*.log
